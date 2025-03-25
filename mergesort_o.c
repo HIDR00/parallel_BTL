@@ -3,6 +3,8 @@
 #include <omp.h>
 #include <time.h>
 
+#define N 1000000
+
 void merge(int *First, int Fsize, int *Second, int Ssize, int ascending) {
     int fi = 0, si = 0, mi = 0, i;
     int *merged;
@@ -72,12 +74,14 @@ void print_array(int *Arr, int size)
 
 
 int main() {
-    int N = 1000000;
-    int* arr = (int*)malloc(N * sizeof(int));
+    int* data;
     int i;
+    double seconds;
+	double start,stop;
 
+    data = (int *)malloc(N*sizeof(int));
     for(i = 0; i < N; i++)
-        arr[i] = rand() % 1000;
+        data[i] = rand() % 1000;
 
     int thread_counts[] = {2, 4, 6, 8, 12};
     int num_tests = sizeof(thread_counts) / sizeof(thread_counts[0]);
@@ -88,12 +92,12 @@ int main() {
         int* descendingArr = (int*)malloc(N * sizeof(int));
         
         for (int j = 0; j < N; j++) {
-            ascendingArr[j] = arr[j];
-            descendingArr[j] = arr[j];
+            ascendingArr[j] = data[j];
+            descendingArr[j] = data[j];
         }
         
         omp_set_num_threads(p);
-        double start_time = omp_get_wtime();
+        start = omp_get_wtime();
         
         #pragma omp parallel
         {
@@ -110,10 +114,10 @@ int main() {
             }
         }
         
-        double end_time = omp_get_wtime();
-        double elapsed_time = end_time - start_time;
+        stop = omp_get_wtime();
+        seconds = stop - start;
         
-        printf("Threads: %d, Time for both sorts: %f s\n", p, elapsed_time);
+        printf("\nArray with %d; %d processors, took %f seconds\n",N,p,seconds);
         
         // printf("\n******* Sorted in Ascending Order *******\n");
         // print_array(ascendingArr, N);  
@@ -125,7 +129,7 @@ int main() {
         free(descendingArr);
     }
     
-    free(arr);
+    free(data);
     
     return 0;
 }

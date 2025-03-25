@@ -4,9 +4,7 @@
 #include <time.h>
 
 #define N 1000000  
-int *arr_asc; 
-int *arr_desc; 
-int thread_count;
+
 
 typedef struct {
     int left;
@@ -78,13 +76,16 @@ void* parallel_sort(void* arg) {
 }
 
 int main() {
-    srand(time(NULL));
-    int *arr_orig = (int*)malloc(N * sizeof(int)); 
-    arr_asc = (int*)malloc(N * sizeof(int));    
-    arr_desc = (int*)malloc(N * sizeof(int));     
+    int * data;
+    int i; 
+    int thread_count;
+    double seconds;
+	double start,stop;
     
     // Tạo dữ liệu ban đầu
-    for (int i = 0; i < N; i++) arr_orig[i] = rand();
+    data = (int *)malloc(N*sizeof(int));
+    for(i = 0; i < N; i++)
+        data[i] = rand() % 1000;
     
     int thread_counts[] = {2, 4, 6, 8, 12};
     for (int t = 0; t < 5; t++) {
@@ -94,13 +95,15 @@ int main() {
         ThreadArgs args_asc[thread_count];    // Đối số cho tăng dần
         ThreadArgs args_desc[thread_count];   // Đối số cho giảm dần
         
+        int* ascendingArr = (int*)malloc(N * sizeof(int));
+        int* descendingArr = (int*)malloc(N * sizeof(int));
         // Sao chép dữ liệu gốc vào cả hai mảng
         for (int i = 0; i < N; i++) {
-            arr_asc[i] = arr_orig[i];
-            arr_desc[i] = arr_orig[i];
+            ascendingArr[i] = data[i];
+            descendingArr[i] = data[i];
         }
         
-        clock_t start = clock();
+        start = clock();
         
         int segment = N / thread_count;
         // Tạo threads cho sắp xếp tăng dần
@@ -108,7 +111,7 @@ int main() {
             args_asc[i].left = i * segment;
             args_asc[i].right = (i == thread_count - 1) ? (N - 1) : ((i + 1) * segment - 1);
             args_asc[i].ascending = 1; // Tăng dần
-            args_asc[i].arr = arr_asc;
+            args_asc[i].arr = ascendingArr;
             pthread_create(&threads_asc[i], NULL, parallel_sort, &args_asc[i]);
         }
         
@@ -117,7 +120,7 @@ int main() {
             args_desc[i].left = i * segment;
             args_desc[i].right = (i == thread_count - 1) ? (N - 1) : ((i + 1) * segment - 1);
             args_desc[i].ascending = 0; // Giảm dần
-            args_desc[i].arr = arr_desc;
+            args_desc[i].arr = descendingArr;
             pthread_create(&threads_desc[i], NULL, parallel_sort, &args_desc[i]);
         }
         
@@ -134,7 +137,7 @@ int main() {
                 int right = (left + 2 * size - 1 < N) ? (left + 2 * size - 1) : (N - 1);
                 int leftCount = mid - left;
                 int rightCount = right - mid + 1;
-                merge(arr_asc + left, leftCount, arr_asc + mid, rightCount, 1);
+                merge(ascendingArr + left, leftCount, ascendingArr + mid, rightCount, 1);
             }
         }
         
@@ -145,18 +148,18 @@ int main() {
                 int right = (left + 2 * size - 1 < N) ? (left + 2 * size - 1) : (N - 1);
                 int leftCount = mid - left;
                 int rightCount = right - mid + 1;
-                merge(arr_desc + left, leftCount, arr_desc + mid, rightCount, 0);
+                merge(descendingArr + left, leftCount, descendingArr + mid, rightCount, 0);
             }
         }
         
-        clock_t end = clock();
-        printf("Threads: %d, Total sorting time (both ascending and descending): %f seconds\n", 
-               thread_count, ((double)(end - start)) / CLOCKS_PER_SEC);
-    
+        stop = clock();
+        seconds = (stop - start) / CLOCKS_PER_SEC;
+        printf("\nArray with %d; %d processors, took %f seconds\n",N,thread_count,seconds);
+
+        free(ascendingArr);
+        free(descendingArr);
     }
     
-    free(arr_orig);
-    free(arr_asc);
-    free(arr_desc);
+    free(data);
     return 0;
 }
