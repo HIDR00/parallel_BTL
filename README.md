@@ -1,6 +1,5 @@
 *** Biên dịch chương trình c: 
-    gcc merge_sort.c -o s 
-
+    gcc mergesort_s.c -o s  
 
 
 *** Biên dịch chương trình Pthread: 
@@ -11,7 +10,6 @@
 *** Biên dịch và chạy chương trình OMP: 
     + clang -Xpreprocessor -fopenmp mergesort_o.c -o o $LDFLAGS -lomp $CPPFLAGS
     + ./o
-
 
 
 *** Biên dịch và chạy chương trình MPI: 

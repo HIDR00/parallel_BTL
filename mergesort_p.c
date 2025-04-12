@@ -82,7 +82,6 @@ int main() {
     double seconds;
 	double start,stop;
     
-    // Tạo dữ liệu ban đầu
     data = (int *)malloc(N*sizeof(int));
     for(i = 0; i < N; i++)
         data[i] = rand() % 1000;
@@ -90,14 +89,13 @@ int main() {
     int thread_counts[] = {2, 4, 6, 8, 12};
     for (int t = 0; t < 5; t++) {
         thread_count = thread_counts[t];
-        pthread_t threads_asc[thread_count];  // Threads cho tăng dần
-        pthread_t threads_desc[thread_count]; // Threads cho giảm dần
-        ThreadArgs args_asc[thread_count];    // Đối số cho tăng dần
-        ThreadArgs args_desc[thread_count];   // Đối số cho giảm dần
+        pthread_t threads_asc[thread_count]; 
+        pthread_t threads_desc[thread_count]; 
+        ThreadArgs args_asc[thread_count];    
+        ThreadArgs args_desc[thread_count];   
         
         int* ascendingArr = (int*)malloc(N * sizeof(int));
         int* descendingArr = (int*)malloc(N * sizeof(int));
-        // Sao chép dữ liệu gốc vào cả hai mảng
         for (int i = 0; i < N; i++) {
             ascendingArr[i] = data[i];
             descendingArr[i] = data[i];
@@ -106,31 +104,27 @@ int main() {
         start = clock();
         
         int segment = N / thread_count;
-        // Tạo threads cho sắp xếp tăng dần
         for (int i = 0; i < thread_count; i++) {
             args_asc[i].left = i * segment;
             args_asc[i].right = (i == thread_count - 1) ? (N - 1) : ((i + 1) * segment - 1);
-            args_asc[i].ascending = 1; // Tăng dần
+            args_asc[i].ascending = 1; 
             args_asc[i].arr = ascendingArr;
             pthread_create(&threads_asc[i], NULL, parallel_sort, &args_asc[i]);
         }
         
-        // Tạo threads cho sắp xếp giảm dần
         for (int i = 0; i < thread_count; i++) {
             args_desc[i].left = i * segment;
             args_desc[i].right = (i == thread_count - 1) ? (N - 1) : ((i + 1) * segment - 1);
-            args_desc[i].ascending = 0; // Giảm dần
+            args_desc[i].ascending = 0; 
             args_desc[i].arr = descendingArr;
             pthread_create(&threads_desc[i], NULL, parallel_sort, &args_desc[i]);
         }
         
-        // Đợi tất cả threads hoàn thành
         for (int i = 0; i < thread_count; i++) {
             pthread_join(threads_asc[i], NULL);
             pthread_join(threads_desc[i], NULL);
         }
         
-        // Hợp nhất các đoạn đã sắp xếp cho tăng dần
         for (int size = segment; size < N; size *= 2) {
             for (int left = 0; left < N - size; left += 2 * size) {
                 int mid = left + size;
@@ -141,7 +135,6 @@ int main() {
             }
         }
         
-        // Hợp nhất các đoạn đã sắp xếp cho giảm dần
         for (int size = segment; size < N; size *= 2) {
             for (int left = 0; left < N - size; left += 2 * size) {
                 int mid = left + size;

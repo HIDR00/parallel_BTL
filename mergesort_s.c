@@ -2,12 +2,7 @@
 #include <time.h>
 #include <stdlib.h>
 
-#define N 100
-
-
-void merge(int *First, int Fsize, int *Second, int Ssize,int ascending);
-void sort(int *Arr, int start, int end,int ascending);
-void print_array(int *Arr, int size);
+#define N 1000000
 
 void merge(int *First, int Fsize, int *Second, int Ssize, int ascending) {
 	int fi = 0, si = 0, mi = 0, i;
@@ -86,7 +81,7 @@ int main(int argc, char **argv)
 
 	data = (int *)malloc(N*sizeof(int));
 	for(i=0;i<N;i++)
-		data[i] = random() % 100;
+		data[i] = random() % 1000;
 	
 	reverse_data = (int *)malloc(N * sizeof(int));
     for (i = 0; i < N; i++) 
@@ -100,11 +95,11 @@ int main(int argc, char **argv)
     seconds = (stop-start)/CLOCKS_PER_SEC;
     printf("\nArray with %d; %d processors, took %f seconds\n",N,1,seconds);
 
-    printf("\n******* Sorted in Ascending Order *******\n");
-    print_array(data, N);  
+    // printf("\n******* Sorted in Ascending Order *******\n");
+    // print_array(data, N);  
 
-	printf("\n******* Sorted in Descending Order *******\n");
-    print_array(reverse_data, N); 
+	// printf("\n******* Sorted in Descending Order *******\n");
+    // print_array(reverse_data, N); 
 
 	free(data);
     free(reverse_data);
