@@ -1,10 +1,9 @@
 *** Biên dịch chương trình c: 
-    gcc merge_sort.c -o s 
-
+    gcc mergesort_s.c -o s  
 
 
 *** Biên dịch chương trình Pthread: 
-    clang -o p merge_sort_p.c -pthread
+    clang -o p mergesort_p.c -pthread
 
 
 
@@ -13,7 +12,6 @@
     + ./o
 
 
-
 *** Biên dịch và chạy chương trình MPI: 
-    + Biên dịch chương trình MPI: mpicc -o hello_world_mpi hello_world_mpi.c
-    + Chạy chương trình MP với 4 tiến trình: mpiexec -np 4 ./hello_world_mpi# parallel_BTL
+    + Biên dịch chương trình MPI: mpicc -o m mergesort_m.c 
+    + Chạy chương trình MP với 4 tiến trình: mpiexec -np 4 ./m

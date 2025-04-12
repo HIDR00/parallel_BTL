@@ -1,14 +1,8 @@
-/* Serial Merge Sort */
 #include <stdio.h>
 #include <time.h>
 #include <stdlib.h>
 
-#define N 100
-
-
-void merge(int *First, int Fsize, int *Second, int Ssize,int ascending);
-void sort(int *Arr, int start, int end,int ascending);
-void print_array(int *Arr, int size);
+#define N 1000000
 
 void merge(int *First, int Fsize, int *Second, int Ssize, int ascending) {
 	int fi = 0, si = 0, mi = 0, i;
@@ -50,6 +44,7 @@ void merge(int *First, int Fsize, int *Second, int Ssize, int ascending) {
 	for (i = 0; i < Ssize; i++)
 		Second[i] = merged[Fsize+i];
 
+	free(merged);
 }
 
 
@@ -59,15 +54,11 @@ void sort(int *Arr, int start, int end, int ascending)
 	int leftCount = mid - start + 1;
 	int rightCount = end - mid;
 
-	/* If the range consists of a single element, it's already sorted */
 	if (end == start) {
 		return;
 	} else {
-		/* sort the left half */
 		sort(Arr, start, mid,ascending);
-		/* sort the right half */
 		sort(Arr, mid+1, end,ascending);
-		/* merge the two halves */
         merge(Arr + start, leftCount, Arr + mid + 1, rightCount, ascending);
 	}
 }
@@ -88,28 +79,27 @@ int main(int argc, char **argv)
 	double seconds;
 	double start,stop;
 
-	start = clock();
 	data = (int *)malloc(N*sizeof(int));
 	for(i=0;i<N;i++)
-		data[i] = random() % 100;
+		data[i] = random() % 1000;
 	
 	reverse_data = (int *)malloc(N * sizeof(int));
     for (i = 0; i < N; i++) 
         reverse_data[i] = data[i]; 
 
+	start = clock();
 	sort(data, 0, N - 1, 1);
 	sort(reverse_data, 0, N - 1, 0);
-
 	stop = clock();
 
     seconds = (stop-start)/CLOCKS_PER_SEC;
     printf("\nArray with %d; %d processors, took %f seconds\n",N,1,seconds);
 
-    printf("\n******* Sorted in Ascending Order *******\n");
-    print_array(data, N);  
+    // printf("\n******* Sorted in Ascending Order *******\n");
+    // print_array(data, N);  
 
-	printf("\n******* Sorted in Descending Order *******\n");
-    print_array(reverse_data, N); 
+	// printf("\n******* Sorted in Descending Order *******\n");
+    // print_array(reverse_data, N); 
 
 	free(data);
     free(reverse_data);

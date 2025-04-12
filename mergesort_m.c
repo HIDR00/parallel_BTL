@@ -3,12 +3,7 @@
 #include <time.h>
 #include <stdlib.h>
 
-#define N 10000000
-
-int * merge(int *First, int Fsize, int *Second, int Ssize,int ascending);
-void sort(int *A, int begin, int end, int ascending);
-void printElements(int rank, int *v, int n);
-
+#define N 1000000
 
 int * merge(int *First, int Fsize, int *Second, int Ssize,int ascending) {
 	int fi = 0, si = 0, mi = 0, i;
@@ -122,7 +117,6 @@ int main(int argc, char **argv)
 		MPI_Scatter(data, local_n, MPI_INT, local_data_desc, local_n, MPI_INT, 0, MPI_COMM_WORLD);
 
 
-		printf("Note Sort data:\n");
 		sort(local_data_asc, 0, local_n - 1, 1);
 		sort(local_data_desc, 0, local_n - 1, 0);
 		free(data);
@@ -178,7 +172,6 @@ int main(int argc, char **argv)
 
 	free(local_data_asc);
     free(local_data_desc);
-	MPI_Barrier(MPI_COMM_WORLD);
 
     MPI_Finalize();
 }

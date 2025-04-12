@@ -3,6 +3,8 @@
 #include <omp.h>
 #include <time.h>
 
+#define N 1000000
+
 void merge(int *First, int Fsize, int *Second, int Ssize, int ascending) {
     int fi = 0, si = 0, mi = 0, i;
     int *merged;
@@ -46,20 +48,25 @@ void merge(int *First, int Fsize, int *Second, int Ssize, int ascending) {
 }
 
 void sort(int *Arr, int start, int end, int ascending) {
+    if (start >= end) return;
+    
     int mid = (start + end) / 2;
     int leftCount = mid - start + 1;
     int rightCount = end - mid;
 
-    if (end == start) {
-        return;
-    } else {
+    if (end - start > 5000) {  
         #pragma omp task shared(Arr)
         sort(Arr, start, mid, ascending);
         #pragma omp task shared(Arr)
         sort(Arr, mid + 1, end, ascending);
         #pragma omp taskwait
-        merge(Arr + start, leftCount, Arr + mid + 1, rightCount, ascending);
+    } else {
+        sort(Arr, start, mid, ascending);
+        sort(Arr, mid + 1, end, ascending);
     }
+
+    merge(Arr + start, leftCount, Arr + mid + 1, rightCount, ascending);
+
 }
 
 void print_array(int *Arr, int size)
@@ -72,12 +79,14 @@ void print_array(int *Arr, int size)
 
 
 int main() {
-    int N = 1000000;
-    int* arr = (int*)malloc(N * sizeof(int));
+    int* data= (int *)malloc(N*sizeof(int));
     int i;
+    double seconds;
+	double start,stop;
 
+     
     for(i = 0; i < N; i++)
-        arr[i] = rand() % 1000;
+        data[i] = rand() % 100000;
 
     int thread_counts[] = {2, 4, 6, 8, 12};
     int num_tests = sizeof(thread_counts) / sizeof(thread_counts[0]);
@@ -88,32 +97,25 @@ int main() {
         int* descendingArr = (int*)malloc(N * sizeof(int));
         
         for (int j = 0; j < N; j++) {
-            ascendingArr[j] = arr[j];
-            descendingArr[j] = arr[j];
+            ascendingArr[j] = data[j];
+            descendingArr[j] = data[j];
         }
         
         omp_set_num_threads(p);
-        double start_time = omp_get_wtime();
+        start = omp_get_wtime();
         
         #pragma omp parallel
-        {
-            #pragma omp sections
+        {            
+            #pragma omp single
             {
-                #pragma omp section
-                {
-                    sort(ascendingArr, 0, N - 1, 1); 
-                }
-                #pragma omp section
-                {
-                    sort(descendingArr, 0, N - 1, 0); 
-                }
-            }
+                sort(ascendingArr, 0, N - 1, 1); 
+                sort(descendingArr, 0, N - 1, 0); 
+            }            
         }
         
-        double end_time = omp_get_wtime();
-        double elapsed_time = end_time - start_time;
-        
-        printf("Threads: %d, Time for both sorts: %f s\n", p, elapsed_time);
+        stop = omp_get_wtime();
+        seconds = stop - start;
+        printf("\nArray with %d; %d processors, took %f seconds\n",N,p,seconds);
         
         // printf("\n******* Sorted in Ascending Order *******\n");
         // print_array(ascendingArr, N);  
@@ -125,7 +127,7 @@ int main() {
         free(descendingArr);
     }
     
-    free(arr);
+    free(data);
     
     return 0;
 }
